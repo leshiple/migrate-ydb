@@ -1,29 +1,29 @@
-import _ from "lodash";
-import date from '../utils/date';
-import pEachSeries from "p-each-series";
+import _ from 'lodash';
+import pEachSeries from 'p-each-series';
 import { Driver, Session } from 'ydb-sdk';
+import date from '../utils/date';
 import Migration from '../schemas/migration';
-import status from "./status";
-import config from "../env/config";
-import migrationsDir from "../env/migrationsDir";
+import status from './status';
+import config from '../env/config';
+import migrationsDir from '../env/migrationsDir';
+
 const SYNTAX_V1 = '--!syntax_v1';
 
 export default async (driver:Driver) => {
   const { migrationsTable } = await config.read();
   const statusItems = await status(driver);
-  const pendingItems = _.filter(statusItems, { appliedAt: "PENDING" });
+  const pendingItems = _.filter(statusItems, { appliedAt: 'PENDING' });
   const migrated:string[] = [];
   const migrations: Migration[] = [];
 
   const migrateItem = async (item:any) => {
     try {
       const migration = await migrationsDir.loadMigration(item.fileName);
-      
-      await migration.up(driver);
 
+      await migration.up(driver);
     } catch (err) {
       const error = new Error(
-        `Could not migrate up ${item.fileName}: ${err.message}`
+        `Could not migrate up ${item.fileName}: ${err.message}`,
       );
       error.stack = err.stack;
       throw error;
@@ -35,9 +35,9 @@ export default async (driver:Driver) => {
     migrations.push(Migration.create(
       fileName,
       fileHash,
-      appliedAt
+      appliedAt,
     ));
-    
+
     migrated.push(item.fileName);
   };
 
@@ -58,10 +58,9 @@ export default async (driver:Driver) => {
         FROM AS_TABLE($migrationData);
       `;
 
-
       const preparedQuery = await session.prepareQuery(query);
       await session.executeQuery(preparedQuery, {
-        '$migrationData': Migration.asTypedCollection(migrations),
+        $migrationData: Migration.asTypedCollection(migrations),
       });
     });
   } catch (err) {

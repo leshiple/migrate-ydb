@@ -1,13 +1,12 @@
-import fs from "fs-extra";
-const path = require("path");
-const { get } = require("lodash");
+import fs from 'fs-extra';
+import path from 'path';
+import { get } from 'lodash';
 
-const DEFAULT_CONFIG_FILE_NAME = "migrate-ydb-config.js";
-
+const DEFAULT_CONFIG_FILE_NAME = 'migrate-ydb-config.js';
 let customConfigContent:any = null;
 
 function getConfigPath() {
-  const fileOptionValue = get((global as any).options, "file");
+  const fileOptionValue = get((global as any).options, 'file');
   if (!fileOptionValue) {
     return path.join(process.cwd(), DEFAULT_CONFIG_FILE_NAME);
   }
@@ -22,7 +21,7 @@ export default {
   DEFAULT_CONFIG_FILE_NAME,
 
   set(configContent: any) {
-    customConfigContent = configContent
+    customConfigContent = configContent;
   },
 
   async shouldExist() {
@@ -44,7 +43,7 @@ export default {
         await fs.stat(configPath);
         throw error;
       } catch (err) {
-        if (err.code !== "ENOENT") {
+        if (err.code !== 'ENOENT') {
           throw error;
         }
       }
@@ -61,5 +60,5 @@ export default {
     }
     const configPath = getConfigPath();
     return Promise.resolve(require(configPath)); // eslint-disable-line
-  }
+  },
 };

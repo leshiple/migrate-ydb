@@ -1,10 +1,10 @@
-import fs from "fs-extra";
-const path = require("path");
-const crypto = require("crypto");
-import config from "./config";
+import fs from 'fs-extra';
+import path from 'path';
+import crypto from 'crypto';
+import config from './config';
 
-const DEFAULT_MIGRATIONS_DIR_NAME = "migrations";
-const DEFAULT_MIGRATION_EXT = ".js";
+const DEFAULT_MIGRATIONS_DIR_NAME = 'migrations';
+const DEFAULT_MIGRATION_EXT = '.js';
 
 async function resolveMigrationsDirPath() {
   let migrationsDir;
@@ -71,14 +71,14 @@ export default {
   async shouldNotExist() {
     const migrationsDir = await resolveMigrationsDirPath();
     const error = new Error(
-      `migrations directory already exists: ${migrationsDir}`
+      `migrations directory already exists: ${migrationsDir}`,
     );
 
     try {
       await fs.stat(migrationsDir);
       throw error;
     } catch (err) {
-      if (err.code !== "ENOENT") {
+      if (err.code !== 'ENOENT') {
         throw error;
       }
     }
@@ -89,17 +89,19 @@ export default {
     const migrationExt = await resolveMigrationFileExtension();
     const files = await fs.readdir(migrationsDir);
     const sampleMigrationFileName = await resolveSampleMigrationFileName();
-    return files.filter(file => path.extname(file) === migrationExt && path.basename(file) !== sampleMigrationFileName).sort();
+    return files.filter((file) => (
+      path.extname(file) === migrationExt && path.basename(file) !== sampleMigrationFileName
+    )).sort();
   },
 
   async loadMigration(fileName: string) {
     const migrationsDir = await resolveMigrationsDirPath();
-    return require(path.join(migrationsDir, fileName));
+    return require(path.join(migrationsDir, fileName));// eslint-disable-line
   },
 
   async loadFileHash(fileName: string) {
-    const migrationsDir = await resolveMigrationsDirPath(); 
-    const filePath = path.join(migrationsDir, fileName)
+    const migrationsDir = await resolveMigrationsDirPath();
+    const filePath = path.join(migrationsDir, fileName);
     const hash = crypto.createHash('sha256');
     const input = await fs.readFile(filePath);
     hash.update(input);

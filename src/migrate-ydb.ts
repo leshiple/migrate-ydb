@@ -1,13 +1,14 @@
 #! /usr/bin/env node
 
-import program from "commander";
-import _ from "lodash";
-import Table from "cli-table3";
-const migrateYdb = require("./lib/migrate-ydb");
-const pkgjson = require("../package.json");
+import program from 'commander';
+import Table from 'cli-table3';
+
+import migrateYdb from './lib/migrate-ydb';
+
+const pkgjson = require('../package.json');
 
 function printMigrated(migrated = []) {
-  migrated.forEach(migratedItem => {
+  migrated.forEach((migratedItem) => {
     console.log(`MIGRATED UP: ${migratedItem}`);
   });
 }
@@ -19,53 +20,46 @@ function handleError(err:any) {
 
 function printStatusTable(statusItems:any) {
   return migrateYdb.config.read().then(() => {
-    const table = new Table({ head: ["Filename", "Hash", "Applied At"]});
+    const table = new Table({ head: ['Filename', 'Hash', 'Applied At'] });
     statusItems.forEach((item:any) => table.push([
       item.fileName,
       item.fileHash,
-      item.appliedAt.toString()
+      item.appliedAt.toString(),
     ]));
     console.log(table.toString());
-  })
-
+  });
 }
 
 program.version(pkgjson.version);
 
 program
-  .command("init")
-  .description("initialize a new migration project")
-  .action(() =>
-  migrateYdb
-      .init()
-      .then(() =>
-        console.log(
-          `Initialization successful. Please edit the generated \`${migrateYdb.config.getConfigFilename()}\` file`
-        )
-      )
-      .catch((err:any) => handleError(err))
-  );
+  .command('init')
+  .description('initialize a new migration project')
+  .action(() => migrateYdb
+    .init()
+    .then(() => console.log(
+      `Initialization successful. Please edit the generated \`${migrateYdb.config.getConfigFilename()}\` file`,
+    ))
+    .catch((err:any) => handleError(err)));
 
 program
-  .command("create [description]")
-  .description("create a new database migration with the provided description")
-  .option("-f --file <file>", "use a custom config file")
+  .command('create [description]')
+  .description('create a new database migration with the provided description')
+  .option('-f --file <file>', 'use a custom config file')
   .action((description:any, options:any) => {
     (global as any).options = options;
     migrateYdb
       .create(description)
-      .then((fileName: string) =>
-        migrateYdb.config.read().then((config: any) => {
-          console.log(`Created: ${config.migrationsDir}/${fileName}`);
-        })
-      )
+      .then((fileName: string) => migrateYdb.config.read().then((config: any) => {
+        console.log(`Created: ${config.migrationsDir}/${fileName}`);
+      }))
       .catch((err: any) => handleError(err));
   });
 
 program
-  .command("up")
-  .description("run all pending database migrations")
-  .option("-f --file <file>", "use a custom config file")
+  .command('up')
+  .description('run all pending database migrations')
+  .option('-f --file <file>', 'use a custom config file')
   .action((options: any) => {
     (global as any).options = options;
     migrateYdb.database
@@ -82,10 +76,10 @@ program
   });
 
 program
-  .command("down")
-  .description("undo the last applied database migration")
-  .option("-f --file <file>", "use a custom config file")
-  .option("-s --step <step>", "count migration rollback")
+  .command('down')
+  .description('undo the last applied database migration')
+  .option('-f --file <file>', 'use a custom config file')
+  .option('-s --step <step>', 'count migration rollback')
   .action((options: any) => {
     (global as any).options = options;
     migrateYdb.database
@@ -103,9 +97,9 @@ program
   });
 
 program
-  .command("status")
-  .description("print the changelog of the database")
-  .option("-f --file <file>", "use a custom config file")
+  .command('status')
+  .description('print the changelog of the database')
+  .option('-f --file <file>', 'use a custom config file')
   .action((options: any) => {
     (global as any).options = options;
     migrateYdb.database

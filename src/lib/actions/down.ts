@@ -1,17 +1,17 @@
-import _ from "lodash";
-import pEachSeries from "p-each-series";
+import pEachSeries from 'p-each-series';
 import { Driver, Session } from 'ydb-sdk';
-import status from "./status";
-import config from "../env/config";
-import migrationsDir from "../env/migrationsDir";
+import status from './status';
+import config from '../env/config';
+import migrationsDir from '../env/migrationsDir';
+
 const SYNTAX_V1 = '--!syntax_v1';
 
 export default async (driver: Driver, options: any) => {
   const step = options?.step || 1;
-  const isNotValidStep = (isNaN(step) && step !== 'all') || step <= 0;
+  const isNotValidStep = (Number.isNaN(step) && step !== 'all') || step <= 0;
 
   if (isNotValidStep) {
-    throw new Error(`option --step expectend positive number or string 'all'`);
+    throw new Error('option --step expectend positive number or string \'all\'');
   }
 
   const downgraded: string[] = [];
@@ -20,36 +20,34 @@ export default async (driver: Driver, options: any) => {
 
   let end;
 
-  if (step !== 'all' ) {
+  if (step !== 'all') {
     end = step;
   }
   const appliedItems = statusItems
-    .filter(item => item.appliedAt !== "PENDING")
-    .sort((a, b) => a.fileName >= b.fileName ? -1 : 1)
-    .slice(0, end)
+    .filter((item) => item.appliedAt !== 'PENDING')
+    .sort((a, b) => (a.fileName >= b.fileName ? -1 : 1))
+    .slice(0, end);
 
-  
   const migrateItem = async (item:any) => {
     try {
       const migration = await migrationsDir.loadMigration(item.fileName);
-      
-      await migration.down(driver);
 
+      await migration.down(driver);
     } catch (err) {
       const error = new Error(
-        `Could not migrate down ${item.fileName}: ${err.message}`
+        `Could not migrate down ${item.fileName}: ${err.message}`,
       );
       error.stack = err.stack;
       throw error;
     }
-    
+
     downgraded.push(item.fileName);
   };
 
   await pEachSeries(appliedItems, migrateItem);
 
   const toDelete = downgraded
-    .map(i => `"${i}"`)
+    .map((i) => `"${i}"`)
     .join(',');
 
   try {

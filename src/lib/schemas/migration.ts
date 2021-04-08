@@ -1,4 +1,4 @@
-import {Ydb, declareType, TypedData} from 'ydb-sdk';
+import { Ydb, declareType, TypedData } from 'ydb-sdk';
 import Type = Ydb.Type;
 
 interface IMigration {
@@ -8,23 +8,23 @@ interface IMigration {
 }
 
 export default class Migration extends TypedData {
-    @declareType({typeId: Type.PrimitiveTypeId.UTF8})
+    @declareType({ typeId: Type.PrimitiveTypeId.UTF8 })
     public fileName: string;
 
-    @declareType({typeId: Type.PrimitiveTypeId.UTF8})
+    @declareType({ typeId: Type.PrimitiveTypeId.UTF8 })
     public fileHash: string;
 
-    @declareType({typeId: Type.PrimitiveTypeId.UTF8})
+    @declareType({ typeId: Type.PrimitiveTypeId.UTF8 })
     public appliedAt: string;
 
     static create(fileName: string, fileHash: string, appliedAt: string): Migration {
-        return new this({fileName, fileHash, appliedAt});
+      return new this({ fileName, fileHash, appliedAt });
     }
 
     constructor(data: IMigration) {
-        super(data);
-        this.fileName = data.fileName;
-        this.fileHash = data.fileHash;
-        this.appliedAt = data.appliedAt;
+      super(data);
+      this.fileName = data.fileName;
+      this.fileHash = data.fileHash;
+      this.appliedAt = data.appliedAt;
     }
 }
