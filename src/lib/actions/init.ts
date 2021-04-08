@@ -1,11 +1,11 @@
-const fs = require("fs-extra");
-const path = require("path");
+import fs from "fs-extra";
+import path from "path";
 
 const migrationsDir = require("../env/migrationsDir");
 const config = require("../env/config");
 
 function copySampleConfigFile() {
-  const source = path.join(__dirname, "../../samples/migrate-mongo-config.js");
+  const source = path.join(__dirname, "../../samples/migrate-ydb-config.js");
   const destination = path.join(
     process.cwd(),
     config.DEFAULT_CONFIG_FILE_NAME

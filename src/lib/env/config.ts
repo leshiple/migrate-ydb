@@ -1,13 +1,13 @@
-const fs = require("fs-extra");
+import fs from "fs-extra";
 const path = require("path");
 const { get } = require("lodash");
 
-const DEFAULT_CONFIG_FILE_NAME = "migrate-mongo-config.js";
+const DEFAULT_CONFIG_FILE_NAME = "migrate-ydb-config.js";
 
-let customConfigContent = null;
+let customConfigContent:any = null;
 
 function getConfigPath() {
-  const fileOptionValue = get(global.options, "file");
+  const fileOptionValue = get((global as any).options, "file");
   if (!fileOptionValue) {
     return path.join(process.cwd(), DEFAULT_CONFIG_FILE_NAME);
   }
@@ -18,10 +18,10 @@ function getConfigPath() {
   return path.join(process.cwd(), fileOptionValue);
 }
 
-module.exports = {
+export default {
   DEFAULT_CONFIG_FILE_NAME,
 
-  set(configContent) {
+  set(configContent: any) {
     customConfigContent = configContent
   },
 

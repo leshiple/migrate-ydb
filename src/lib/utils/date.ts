@@ -1,4 +1,4 @@
-const { format } = require("date-fns");
+import { format } from "date-fns";
 
 const now = (dateString = Date.now()) => {
   const date = new Date(dateString);
@@ -13,9 +13,9 @@ const now = (dateString = Date.now()) => {
   );
 };
 
-const nowAsString = () => format(now(), "yyyyMMddHHmmss");
+const nowAsString = () => format(now(), "yyyy_MM_dd_HHmmss");
 
-module.exports = {
+export default {
   now,
   nowAsString
 };

@@ -1,9 +1,9 @@
 #! /usr/bin/env node
 
-const program = require("commander");
-const _ = require("lodash");
-const Table = require("cli-table3");
-const migrateMongo = require("../lib/migrate-mongo");
+import program from "commander";
+import _ from "lodash";
+import Table from "cli-table3";
+const migrateYdb = require("./lib/migrate-ydb");
 const pkgjson = require("../package.json");
 
 function printMigrated(migrated = []) {
@@ -12,19 +12,22 @@ function printMigrated(migrated = []) {
   });
 }
 
-function handleError(err) {
+function handleError(err:any) {
   console.error(`ERROR: ${err.message}`, err.stack);
   process.exit(1);
 }
 
-function printStatusTable(statusItems) {
-  return migrateMongo.config.read().then(config => {
-    const useFileHash = config.useFileHash === true;
-    const table = new Table({ head: useFileHash ? ["Filename", "Hash", "Applied At"] : ["Filename", "Applied At"]});
-    statusItems.forEach(item => table.push(_.values(item)));
+function printStatusTable(statusItems:any) {
+  return migrateYdb.config.read().then(() => {
+    const table = new Table({ head: ["Filename", "Hash", "Applied At"]});
+    statusItems.forEach((item:any) => table.push([
+      item.fileName,
+      item.fileHash,
+      item.appliedAt.toString()
+    ]));
     console.log(table.toString());
   })
-  
+
 }
 
 program.version(pkgjson.version);
@@ -33,46 +36,46 @@ program
   .command("init")
   .description("initialize a new migration project")
   .action(() =>
-    migrateMongo
+  migrateYdb
       .init()
       .then(() =>
         console.log(
-          `Initialization successful. Please edit the generated \`${migrateMongo.config.getConfigFilename()}\` file`
+          `Initialization successful. Please edit the generated \`${migrateYdb.config.getConfigFilename()}\` file`
         )
       )
-      .catch(err => handleError(err))
+      .catch((err:any) => handleError(err))
   );
 
 program
   .command("create [description]")
   .description("create a new database migration with the provided description")
   .option("-f --file <file>", "use a custom config file")
-  .action((description, options) => {
-    global.options = options;
-    migrateMongo
+  .action((description:any, options:any) => {
+    (global as any).options = options;
+    migrateYdb
       .create(description)
-      .then(fileName => 
-        migrateMongo.config.read().then(config => {
+      .then((fileName: string) =>
+        migrateYdb.config.read().then((config: any) => {
           console.log(`Created: ${config.migrationsDir}/${fileName}`);
         })
       )
-      .catch(err => handleError(err));
+      .catch((err: any) => handleError(err));
   });
 
 program
   .command("up")
   .description("run all pending database migrations")
   .option("-f --file <file>", "use a custom config file")
-  .action(options => {
-    global.options = options;
-    migrateMongo.database
+  .action((options: any) => {
+    (global as any).options = options;
+    migrateYdb.database
       .connect()
-      .then(({db, client}) => migrateMongo.up(db, client))
-      .then(migrated => {
+      .then((driver:any) => migrateYdb.up(driver))
+      .then((migrated: any) => {
         printMigrated(migrated);
         process.exit(0);
       })
-      .catch(err => {
+      .catch((err: any) => {
         handleError(err);
         printMigrated(err.migrated);
       });
@@ -82,18 +85,19 @@ program
   .command("down")
   .description("undo the last applied database migration")
   .option("-f --file <file>", "use a custom config file")
-  .action(options => {
-    global.options = options;
-    migrateMongo.database
+  .option("-s --step <step>", "count migration rollback")
+  .action((options: any) => {
+    (global as any).options = options;
+    migrateYdb.database
       .connect()
-      .then(({db, client}) => migrateMongo.down(db, client))
-      .then(migrated => {
-        migrated.forEach(migratedItem => {
+      .then((driver: any) => migrateYdb.down(driver, options))
+      .then((migrated: any) => {
+        migrated.forEach((migratedItem: any) => {
           console.log(`MIGRATED DOWN: ${migratedItem}`);
         });
         process.exit(0);
       })
-      .catch(err => {
+      .catch((err: any) => {
         handleError(err);
       });
   });
@@ -102,22 +106,18 @@ program
   .command("status")
   .description("print the changelog of the database")
   .option("-f --file <file>", "use a custom config file")
-  .action(options => {
-    global.options = options;
-    migrateMongo.database
+  .action((options: any) => {
+    (global as any).options = options;
+    migrateYdb.database
       .connect()
-      .then(({db, client}) => migrateMongo.status(db, client))
-      .then(statusItems => printStatusTable(statusItems))
+      .then((driver: any) => migrateYdb.status(driver))
+      .then((statusItems: any) => printStatusTable(statusItems))
       .then(() => {
         process.exit(0);
       })
-      .catch(err => {
+      .catch((err: any) => {
         handleError(err);
       });
   });
 
 program.parse(process.argv);
-
-if (_.isEmpty(program.rawArgs)) {
-  program.outputHelp();
-}

@@ -1,17 +1,17 @@
 const init = require("./actions/init");
 const create = require("./actions/create");
-const up = require("./actions/up");
-const down = require("./actions/down");
-const status = require("./actions/status");
+import up from "./actions/up";
+import down from "./actions/down";
+import istatus from "./actions/status";
 const database = require("./env/database");
-const config = require("./env/config");
+import config from "./env/config";
 
 module.exports = {
   init,
   create,
   up,
   down,
-  status,
+  status: istatus,
   database,
   config
 };

@@ -1,7 +1,7 @@
-const fs = require("fs-extra");
+import fs from "fs-extra";
 const path = require("path");
 const crypto = require("crypto");
-const config = require("./config");
+import config from "./config";
 
 const DEFAULT_MIGRATIONS_DIR_NAME = "migrations";
 const DEFAULT_MIGRATION_EXT = ".js";
@@ -54,7 +54,7 @@ async function resolveSampleMigrationPath() {
   return path.join(migrationsDir, sampleMigrationSampleFileName);
 }
 
-module.exports = {
+export default {
   resolve: resolveMigrationsDirPath,
   resolveSampleMigrationPath,
   resolveMigrationFileExtension,
@@ -92,12 +92,12 @@ module.exports = {
     return files.filter(file => path.extname(file) === migrationExt && path.basename(file) !== sampleMigrationFileName).sort();
   },
 
-  async loadMigration(fileName) {
+  async loadMigration(fileName: string) {
     const migrationsDir = await resolveMigrationsDirPath();
-    return require(path.join(migrationsDir, fileName)); // eslint-disable-line
+    return require(path.join(migrationsDir, fileName));
   },
 
-  async loadFileHash(fileName) {
+  async loadFileHash(fileName: string) {
     const migrationsDir = await resolveMigrationsDirPath(); 
     const filePath = path.join(migrationsDir, fileName)
     const hash = crypto.createHash('sha256');
