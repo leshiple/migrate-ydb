@@ -77,9 +77,9 @@ program
 
 program
   .command('down')
-  .description('undo the last applied database migration')
+  .description('undo the applied database migration')
   .option('-f --file <file>', 'use a custom config file')
-  .option('-s --step <step>', 'count migration rollback')
+  .option('-s --step <step>', 'count migration rollback, expects: "all" or positive number')
   .action((options: any) => {
     (global as any).options = options;
     migrateYdb.database
