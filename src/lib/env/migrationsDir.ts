@@ -54,67 +54,73 @@ async function resolveSampleMigrationPath() {
   return path.join(migrationsDir, sampleMigrationSampleFileName);
 }
 
+async function shouldExist() {
+  const migrationsDir = await resolveMigrationsDirPath();
+  try {
+    await fs.stat(migrationsDir);
+  } catch (err) {
+    throw new Error(`migrations directory does not exist: ${migrationsDir}`);
+  }
+}
+
+async function shouldNotExist() {
+  const migrationsDir = await resolveMigrationsDirPath();
+  const error = new Error(
+    `migrations directory already exists: ${migrationsDir}`,
+  );
+
+  try {
+    await fs.stat(migrationsDir);
+    throw error;
+  } catch (err) {
+    if (err.code !== 'ENOENT') {
+      throw error;
+    }
+  }
+}
+
+async function getFileNames() {
+  const migrationsDir = await resolveMigrationsDirPath();
+  const migrationExt = await resolveMigrationFileExtension();
+  const files = await fs.readdir(migrationsDir);
+  const sampleMigrationFileName = await resolveSampleMigrationFileName();
+  return files.filter((file) => (
+    path.extname(file) === migrationExt && path.basename(file) !== sampleMigrationFileName
+  )).sort();
+}
+
+async function loadMigration(fileName: string) {
+  const migrationsDir = await resolveMigrationsDirPath();
+  return require(path.join(migrationsDir, fileName));// eslint-disable-line
+}
+
+async function loadFileHash(fileName: string) {
+  const migrationsDir = await resolveMigrationsDirPath();
+  const filePath = path.join(migrationsDir, fileName);
+  const hash = crypto.createHash('sha256');
+  const input = await fs.readFile(filePath);
+  hash.update(input);
+  return hash.digest('hex');
+}
+
+async function doesSampleMigrationExist() {
+  const samplePath = await resolveSampleMigrationPath();
+  try {
+    await fs.stat(samplePath);
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+
 export default {
   resolve: resolveMigrationsDirPath,
   resolveSampleMigrationPath,
   resolveMigrationFileExtension,
-
-  async shouldExist() {
-    const migrationsDir = await resolveMigrationsDirPath();
-    try {
-      await fs.stat(migrationsDir);
-    } catch (err) {
-      throw new Error(`migrations directory does not exist: ${migrationsDir}`);
-    }
-  },
-
-  async shouldNotExist() {
-    const migrationsDir = await resolveMigrationsDirPath();
-    const error = new Error(
-      `migrations directory already exists: ${migrationsDir}`,
-    );
-
-    try {
-      await fs.stat(migrationsDir);
-      throw error;
-    } catch (err) {
-      if (err.code !== 'ENOENT') {
-        throw error;
-      }
-    }
-  },
-
-  async getFileNames() {
-    const migrationsDir = await resolveMigrationsDirPath();
-    const migrationExt = await resolveMigrationFileExtension();
-    const files = await fs.readdir(migrationsDir);
-    const sampleMigrationFileName = await resolveSampleMigrationFileName();
-    return files.filter((file) => (
-      path.extname(file) === migrationExt && path.basename(file) !== sampleMigrationFileName
-    )).sort();
-  },
-
-  async loadMigration(fileName: string) {
-    const migrationsDir = await resolveMigrationsDirPath();
-    return require(path.join(migrationsDir, fileName));// eslint-disable-line
-  },
-
-  async loadFileHash(fileName: string) {
-    const migrationsDir = await resolveMigrationsDirPath();
-    const filePath = path.join(migrationsDir, fileName);
-    const hash = crypto.createHash('sha256');
-    const input = await fs.readFile(filePath);
-    hash.update(input);
-    return hash.digest('hex');
-  },
-
-  async doesSampleMigrationExist() {
-    const samplePath = await resolveSampleMigrationPath();
-    try {
-      await fs.stat(samplePath);
-      return true;
-    } catch (err) {
-      return false;
-    }
-  },
+  shouldExist,
+  shouldNotExist,
+  getFileNames,
+  loadMigration,
+  loadFileHash,
+  doesSampleMigrationExist,
 };
