@@ -13,7 +13,7 @@ const now = (dateString = Date.now()) => {
   );
 };
 
-const nowAsString = () => format(now(), 'yyyy_MM_dd_HHmmss');
+const nowAsString = () => format(now(), 'yyyy_MM_dd_HH-mm-ss');
 
 export default {
   now,
