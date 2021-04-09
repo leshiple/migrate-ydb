@@ -13,9 +13,7 @@ const config = {
     dbName: '/ru-central1/xxxxxxxxxxxxxxxxxxxxxxx',
 
     options: {
-      useNewUrlParser: true, // removes a deprecation warning when connecting
-      useUnifiedTopology: true, // removes a deprecating warning when connecting
-      connectTimeoutMS: 10000, // increase connection timeout to 1 hour
+      connectTimeoutMS: 10000, // connection timeout
     },
   },
 
