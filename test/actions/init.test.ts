@@ -1,17 +1,22 @@
-import fs from 'fs-extra';
+import fs, { CopyOptions } from 'fs-extra';
 import path from 'path';
 import sinon from 'sinon';
-import { ImportMock } from 'ts-mock-imports';
+import { ImportMock, OtherManager } from 'ts-mock-imports';
 import { expect } from 'chai';
 import init from '../../src/lib/actions/init';
 import migrationsDir from '../../src/lib/env/migrationsDir';
 import config from '../../src/lib/env/config';
 
 describe('init', () => {
-  let mockManagerMigrationsDirShouldNotExist: any;
-  let mockManagerConfigShouldNotExist: any;
-  let mockManagerFsCopy: any;
-  let mockManagerFsMkdirs: any;
+  let mockManagerMigrationsDirShouldNotExist: OtherManager<() => Promise<void>>;
+  let mockManagerConfigShouldNotExist: OtherManager<() => Promise<void>>;
+  /* eslint-disable no-unused-vars */
+  let mockManagerFsCopy: OtherManager<{ (src: string, dest: string, options?: CopyOptions):
+    Promise<void>;(src: string, dest: string, callback: (err: Error) => void): void;
+    (src: string, dest: string, options: CopyOptions, callback: (err: Error) => void): void; }>;
+  let mockManagerFsMkdirs: OtherManager<{ (dir: string): Promise<void>;
+    (dir: string, callback: (err: Error) => void): void; }>;
+  /* eslint-enable no-unused-vars */
 
   beforeEach(() => {
     ImportMock.restore();
