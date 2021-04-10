@@ -2,13 +2,10 @@ import fs from 'fs-extra';
 import path from 'path';
 import sinon from 'sinon';
 import { ImportMock } from 'ts-mock-imports';
+import { expect } from 'chai';
 import create from '../../src/lib/actions/create';
 import migrationsDir from '../../src/lib/env/migrationsDir';
 import config from '../../src/lib/env/config';
-
-const { expect } = require('chai');
-
-ImportMock.restore();
 
 describe('create', () => {
   let mockManagerShouldExist:any;
