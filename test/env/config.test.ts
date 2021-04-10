@@ -56,7 +56,7 @@ describe('config', () => {
 
       it('should not yield an error if the config does not exist', async () => {
         const error = new Error('File does not exist');
-        error.name = 'ENOENT';
+        (error as any).code = 'ENOENT';
         (fs as any).stat.returns(Promise.reject(error));
         await config.shouldNotExist();
       });
