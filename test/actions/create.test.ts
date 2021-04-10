@@ -1,34 +1,38 @@
-import fs from 'fs-extra';
+import fs, { CopyOptions } from 'fs-extra';
 import path from 'path';
 import sinon from 'sinon';
-import { ImportMock } from 'ts-mock-imports';
+import { ImportMock, OtherManager } from 'ts-mock-imports';
 import { expect } from 'chai';
 import create from '../../src/lib/actions/create';
 import migrationsDir from '../../src/lib/env/migrationsDir';
 import config from '../../src/lib/env/config';
 
 describe('create', () => {
-  let mockManagerShouldExist:any;
-  let mockResolveMigrationFileExtension: any;
-  let mockDoesSampleMigrationExist: any;
-  let mockConfigShouldExist: any;
-  let mockFScopy: any;
+  let mockManagerMigrationsDirShouldExist: OtherManager<() => Promise<void>>;
+  let mockManagerMigrationsDirResolveMigrationFileExtension: OtherManager<() => Promise<void>>;
+  let mockManagerMigrationsDirDoesSampleMigrationExist: OtherManager<() => Promise<boolean>>;
+  let mockManagerConfigShouldExist: OtherManager<() => Promise<void>>;
+  /* eslint-disable no-unused-vars */
+  let mockManagerFsCopy: OtherManager<{ (src: string, dest: string, options?: CopyOptions):
+    Promise<void>;(src: string, dest: string, callback: (err: Error) => void): void;
+    (src: string, dest: string, options: CopyOptions, callback: (err: Error) => void): void; }>;
+  /* eslint-enable no-unused-vars */
 
   beforeEach(() => {
     ImportMock.restore();
-    mockManagerShouldExist = ImportMock.mockOther(migrationsDir, 'shouldExist', sinon.stub().returns(Promise.resolve()));
-    mockResolveMigrationFileExtension = ImportMock.mockOther(migrationsDir, 'resolveMigrationFileExtension', sinon.stub().returns('.js'));
-    mockDoesSampleMigrationExist = ImportMock.mockOther(migrationsDir, 'doesSampleMigrationExist', sinon.stub().returns(Promise.resolve(false)));
-    mockConfigShouldExist = ImportMock.mockOther(config, 'shouldExist', sinon.stub().returns(Promise.resolve()));
-    mockFScopy = ImportMock.mockOther(fs, 'copy', sinon.stub().returns(Promise.resolve()));
+    mockManagerMigrationsDirShouldExist = ImportMock.mockOther(migrationsDir, 'shouldExist', sinon.stub().returns(Promise.resolve()));
+    mockManagerMigrationsDirResolveMigrationFileExtension = ImportMock.mockOther(migrationsDir, 'resolveMigrationFileExtension', sinon.stub().returns('.js'));
+    mockManagerMigrationsDirDoesSampleMigrationExist = ImportMock.mockOther(migrationsDir, 'doesSampleMigrationExist', sinon.stub().returns(Promise.resolve(false)));
+    mockManagerConfigShouldExist = ImportMock.mockOther(config, 'shouldExist', sinon.stub().returns(Promise.resolve()));
+    mockManagerFsCopy = ImportMock.mockOther(fs, 'copy', sinon.stub().returns(Promise.resolve()));
   });
 
   afterEach(() => {
-    mockManagerShouldExist.restore();
-    mockResolveMigrationFileExtension.restore();
-    mockDoesSampleMigrationExist.restore();
-    mockConfigShouldExist.restore();
-    mockFScopy.restore();
+    mockManagerMigrationsDirShouldExist.restore();
+    mockManagerMigrationsDirResolveMigrationFileExtension.restore();
+    mockManagerMigrationsDirDoesSampleMigrationExist.restore();
+    mockManagerConfigShouldExist.restore();
+    mockManagerFsCopy.restore();
   });
 
   it('should yield an error when called without a description', async () => {
