@@ -74,28 +74,7 @@ describe('down', () => {
     return {
       destroy: sinon.stub().returns(Promise.resolve()),
       tableClient: {
-        withSession: sinon.stub().returns(Promise.resolve([
-          {
-            fileName: '2016_05_09_11-32-24-first_migration.js',
-            fileHash: '0f295f21f63c66dc78d8dc091ce3c8bab8c56d8b74fb35a0c99f6d9953e37d1a',
-            appliedAt: '2016_05_09_11-32-24',
-          },
-          {
-            fileName: '2016_05_12_09-17-01-second_migration.js',
-            fileHash: '18b4d9c95a8678ae3a6dd3ae5b8961737a6c3dd65e3e655a5f5718d97a0bff70',
-            appliedAt: '2016_05_13_14-45-24',
-          },
-          {
-            fileName: '2016_05_13_15-53-21-third_migration.js',
-            fileHash: '1f9eb3b5eb70b2fb5b83fa0c660d859082f0bb615e835d29943d26fb0d352022',
-            appliedAt: 'PENDING',
-          },
-          {
-            fileName: '2016_05_13_16-53-21-forth_migration.js',
-            fileHash: '3245987sh4kgjadsf5b83fa0c660d859082f0bb615e835d29943d26fb0d352022',
-            appliedAt: 'PENDING',
-          },
-        ])),
+        withSession: sinon.stub().returns(Promise.resolve()),
       },
     };
   }
