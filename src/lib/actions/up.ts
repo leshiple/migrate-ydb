@@ -11,7 +11,7 @@ const SYNTAX_V1 = '--!syntax_v1';
 
 export default async (driver:Driver) => {
   const { migrationsTable } = await config.read();
-  const statusItems = await status(driver);
+  const statusItems = await status.get(driver);
   const pendingItems = _.filter(statusItems, { appliedAt: 'PENDING' });
   const migrated:string[] = [];
   const migrations: Migration[] = [];

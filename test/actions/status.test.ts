@@ -1,5 +1,4 @@
 import fs, { CopyOptions } from 'fs-extra';
-// import path from 'path';
 import sinon from 'sinon';
 import { ImportMock, OtherManager } from 'ts-mock-imports';
 import { expect } from 'chai';
@@ -90,7 +89,7 @@ describe('status', () => {
   });
 
   it('should check that the migrations directory exists', async () => {
-    await status(driver);
+    await status.get(driver);
     expect((migrationsDir as any).shouldExist.called).to.equal(true);
   });
 
@@ -99,7 +98,7 @@ describe('status', () => {
       Promise.reject(new Error('migrations directory does not exist')),
     );
     try {
-      await status(driver);
+      await status.get(driver);
       expect.fail('Error was not thrown');
     } catch (err) {
       expect(err.message).to.equal('migrations directory does not exist');
@@ -107,7 +106,7 @@ describe('status', () => {
   });
 
   it('should check that the config file exists', async () => {
-    await status(driver);
+    await status.get(driver);
     expect((config as any).shouldExist.called).to.equal(true);
   });
 
@@ -116,7 +115,7 @@ describe('status', () => {
       Promise.reject(new Error('config file does not exist')),
     );
     try {
-      await status(driver);
+      await status.get(driver);
       expect.fail('Error was not thrown');
     } catch (err) {
       expect(err.message).to.equal('config file does not exist');
@@ -124,7 +123,7 @@ describe('status', () => {
   });
 
   it('should get the list of files in the migrations directory', async () => {
-    await status(driver);
+    await status.get(driver);
     expect((migrationsDir as any).getFileNames.called).to.equal(true);
   });
 
@@ -133,7 +132,7 @@ describe('status', () => {
       Promise.reject(new Error('File system unavailable')),
     );
     try {
-      await status(driver);
+      await status.get(driver);
       expect.fail('Error was not thrown');
     } catch (err) {
       expect(err.message).to.equal('File system unavailable');
@@ -141,7 +140,7 @@ describe('status', () => {
   });
 
   it('should yield an array that indicates the status of the migrations in the directory', async () => {
-    const statusItems = await status(driver);
+    const statusItems = await status.get(driver);
     expect(statusItems).to.deep.equal([
       {
         fileName: '2016_05_09_11-32-24-first_migration.js',
@@ -175,7 +174,7 @@ describe('status', () => {
       }
     });
 
-    const statusItems = await status(driver);
+    const statusItems = await status.get(driver);
     expect(statusItems).to.deep.equal([
       {
         appliedAt: '2016_05_09_11-32-24',

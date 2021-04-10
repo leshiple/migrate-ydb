@@ -11,7 +11,7 @@ export default {
   create,
   up,
   down,
-  status: istatus,
+  status: istatus.get,
   database,
   config,
 };

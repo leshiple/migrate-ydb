@@ -8,15 +8,16 @@ const SYNTAX_V1 = '--!syntax_v1';
 
 export default async (driver: Driver, options: any) => {
   const step = options?.step || 1;
-  const isNotValidStep = (Number.isNaN(step) && step !== 'all') || step <= 0;
+
+  const isNotValidStep = (Number.isNaN(Number(step)) && step !== 'all') || step <= 0;
 
   if (isNotValidStep) {
-    throw new Error('option --step expectend positive number or string \'all\'');
+    throw new Error('option --step expectend positive number or string "all"');
   }
 
   const downgraded: string[] = [];
   const { migrationsTable } = await config.read();
-  const statusItems = await status(driver);
+  const statusItems = await status.get(driver);
 
   let end;
 
