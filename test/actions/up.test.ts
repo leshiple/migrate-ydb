@@ -1,4 +1,3 @@
-// import fs, { CopyOptions } from 'fs-extra';
 import sinon from 'sinon';
 import { ImportMock } from 'ts-mock-imports';
 import { expect } from 'chai';
@@ -7,7 +6,7 @@ import status from '../../src/lib/actions/status';
 import migrationsDir from '../../src/lib/env/migrationsDir';
 import config from '../../src/lib/env/config';
 
-describe('down', () => {
+describe('up', () => {
   let driver: any;
   let mockManagerMigrationsDirLoadMigration: any;
   let firstPendingMigration: any;
