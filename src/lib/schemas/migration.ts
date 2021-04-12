@@ -1,7 +1,7 @@
 import { Ydb, declareType, TypedData } from 'ydb-sdk';
 import Type = Ydb.Type;
 
-interface IMigration {
+export interface IMigration {
     fileName: string;
     fileHash: string;
     appliedAt: string;

@@ -1,4 +1,6 @@
 import {
+  Driver,
+  Session,
   Column,
   TableDescription,
   Ydb,
@@ -12,14 +14,14 @@ import config from '../env/config';
 const SYNTAX_V1 = '--!syntax_v1';
 
 export default {
-  async get(driver: any) {
+  async get(driver: Driver) {
     await migrationsDir.shouldExist();
     await config.shouldExist();
     const fileNames = await migrationsDir.getFileNames();
 
     const { migrationsTable } = await config.read();
 
-    const migrations = await driver.tableClient.withSession(async (session: any) => {
+    const migrations = await driver.tableClient.withSession(async (session: Session) => {
     // Create table
       await session.createTable(
         migrationsTable,

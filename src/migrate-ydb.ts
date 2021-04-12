@@ -2,29 +2,31 @@
 
 import program from 'commander';
 import Table from 'cli-table3';
+import { Driver } from 'ydb-sdk';
 
+import { IMigration } from './lib/schemas/migration';
 import migrateYdb from './lib/migrate-ydb';
 
 const pkgjson = require('../package.json');
 
-function printMigrated(migrated = []) {
+function printMigrated(migrated: string[] = []) {
   migrated.forEach((migratedItem) => {
     console.log(`MIGRATED UP: ${migratedItem}`);
   });
 }
 
-function handleError(err:any) {
+function handleError(err:Error) {
   console.error(`ERROR: ${err.message}`, err.stack);
   process.exit(1);
 }
 
-function printStatusTable(statusItems:any) {
+function printStatusTable(statusItems: IMigration[]) {
   return migrateYdb.config.read().then(() => {
     const table = new Table({ head: ['Filename', 'Hash', 'Applied At'] });
-    statusItems.forEach((item:any) => table.push([
+    statusItems.forEach((item:IMigration) => table.push([
       item.fileName,
       item.fileHash,
-      item.appliedAt.toString(),
+      item.appliedAt,
     ]));
     console.log(table.toString());
   });
@@ -40,20 +42,20 @@ program
     .then(() => console.log(
       `Initialization successful. Please edit the generated \`${migrateYdb.config.getConfigFilename()}\` file`,
     ))
-    .catch((err:any) => handleError(err)));
+    .catch((err:Error) => handleError(err)));
 
 program
   .command('create [description]')
   .description('create a new database migration with the provided description')
   .option('-f --file <file>', 'use a custom config file')
-  .action((description:any, options:any) => {
+  .action((description:string, options:any) => {
     (global as any).options = options;
     migrateYdb
       .create(description)
       .then((fileName: string) => migrateYdb.config.read().then((config: any) => {
         console.log(`Created: ${config.migrationsDir}/${fileName}`);
       }))
-      .catch((err: any) => handleError(err));
+      .catch((err: Error) => handleError(err));
   });
 
 program
@@ -65,13 +67,12 @@ program
     migrateYdb.database
       .connect()
       .then((driver:any) => migrateYdb.up(driver))
-      .then((migrated: any) => {
+      .then((migrated: string[]) => {
         printMigrated(migrated);
         process.exit(0);
       })
-      .catch((err: any) => {
+      .catch((err: Error) => {
         handleError(err);
-        printMigrated(err.migrated);
       });
   });
 
@@ -84,8 +85,8 @@ program
     (global as any).options = options;
     migrateYdb.database
       .connect()
-      .then((driver: any) => migrateYdb.down(driver, options))
-      .then((migrated: any) => {
+      .then((driver: Driver) => migrateYdb.down(driver, options))
+      .then((migrated: string[]) => {
         migrated.forEach((migratedItem: any) => {
           console.log(`MIGRATED DOWN: ${migratedItem}`);
         });
@@ -104,12 +105,12 @@ program
     (global as any).options = options;
     migrateYdb.database
       .connect()
-      .then((driver: any) => migrateYdb.status(driver))
-      .then((statusItems: any) => printStatusTable(statusItems))
+      .then((driver: Driver) => migrateYdb.status(driver))
+      .then((statusItems: IMigration[]) => printStatusTable(statusItems))
       .then(() => {
         process.exit(0);
       })
-      .catch((err: any) => {
+      .catch((err: Error) => {
         handleError(err);
       });
   });

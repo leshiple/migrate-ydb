@@ -3,6 +3,7 @@ import { Driver, Session } from 'ydb-sdk';
 import status from './status';
 import config from '../env/config';
 import migrationsDir from '../env/migrationsDir';
+import { IMigration } from '../schemas/migration';
 
 const SYNTAX_V1 = '--!syntax_v1';
 
@@ -29,7 +30,7 @@ export default async (driver: Driver, options: any) => {
     .sort((a, b) => (a.fileName >= b.fileName ? -1 : 1))
     .slice(0, end);
 
-  const migrateItem = async (item:any) => {
+  const migrateItem = async (item:IMigration) => {
     try {
       const migration = await migrationsDir.loadMigration(item.fileName);
 

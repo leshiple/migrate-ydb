@@ -2,7 +2,7 @@ import _ from 'lodash';
 import pEachSeries from 'p-each-series';
 import { Driver, Session } from 'ydb-sdk';
 import date from '../utils/date';
-import Migration from '../schemas/migration';
+import Migration, { IMigration } from '../schemas/migration';
 import status from './status';
 import config from '../env/config';
 import migrationsDir from '../env/migrationsDir';
@@ -16,7 +16,7 @@ export default async (driver:Driver) => {
   const migrated:string[] = [];
   const migrations: Migration[] = [];
 
-  const migrateItem = async (item:any) => {
+  const migrateItem = async (item:IMigration) => {
     try {
       const migration = await migrationsDir.loadMigration(item.fileName);
 
